@@ -7,7 +7,7 @@ const Home = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const response = await fetch('http://localhost:3000/api/getTodaysCars');
+      const response = await fetch('https://r1todo.vercel.app/api/getTodaysCars');
       const data = await response.json();
       setCarData(data);
     };

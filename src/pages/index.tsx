@@ -1,15 +1,28 @@
-// pages/index.js
 import { useState, useEffect } from 'react';
 import CarTable from '../components/CarTable';
 
+interface Car {
+  name: string;
+  time: string;
+}
+
+interface CarData {
+  length: number;
+  cars: Car[];
+}
+
 const Home = () => {
-  const [carData, setCarData] = useState(null);
+  const [carData, setCarData] = useState<CarData | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
-      const response = await fetch('https://r1todo.vercel.app/api/getTodaysCars');
-      const data = await response.json();
-      setCarData(data);
+      try {
+        const response = await fetch('https://r1todo.vercel.app/api/getTodaysCars');
+        const data = await response.json();
+        setCarData(data);
+      } catch (error) {
+        console.error('Error fetching car data:', error);
+      }
     };
     fetchData();
   }, []);

@@ -27,15 +27,21 @@ const getTodaysCars = async (req: NextApiRequest, res: NextApiResponse) => {
             const carNameElement = car.querySelector('.slot.taken-slot');
             const carTimeElement = car.querySelector('.time-slot');
             if (carNameElement && carTimeElement) {
-                const carName = carNameElement.textContent.trim();
-                const carTime = carTimeElement.textContent.trim();
-                // Check if the time already exists in groupedCars
-                if (groupedCars[carTime]) {
-                    // If the time already exists, push the car name to the existing array
-                    groupedCars[carTime].name.push(carName);
+                const carName = carNameElement.textContent?.trim();
+                const carTime = carTimeElement.textContent?.trim();
+            
+                // Check if carName and carTime are defined strings
+                if (typeof carName === 'string' && typeof carTime === 'string') {
+                    // Check if the time already exists in groupedCars
+                    if (groupedCars[carTime]) {
+                        // If the time already exists, push the car name to the existing array
+                        groupedCars[carTime].name.push(carName);
+                    } else {
+                        // If the time doesn't exist, create a new array with the car name
+                        groupedCars[carTime] = { name: [carName] };
+                    }
                 } else {
-                    // If the time doesn't exist, create a new array with the car name
-                    groupedCars[carTime] = { name: [carName] };
+                    // Handle the case where either carName or carTime is not a string
                 }
             }
         });

@@ -61,7 +61,7 @@ const CarTable = ({ data }) => {
     if (lastGreyRow) {
       rows.forEach(row => {
         if (row.key.startsWith(lastGreyRow)) {
-          row.props.style.backgroundColor = 'green';
+          row.props.style.backgroundColor = '#a0e0ff';
         }
       });
     }

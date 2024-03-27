@@ -1,4 +1,3 @@
-// components/CarTable.js
 import React from 'react';
 
 const CarTable = ({ data }) => {
@@ -15,28 +14,56 @@ const CarTable = ({ data }) => {
     return groupedCars;
   };
 
+  function getTime() {
+    const today = new Date();
+    const hours = today.getHours();
+    const minutes = today.getMinutes();
+    return `${hours}:${minutes}`;
+  }
+
+  // Check if a given time is earlier than the current time
+  const isEarlierThanCurrentTime = (time) => {
+    const [currentHours, currentMinutes] = getTime().split(':').map(Number);
+    const [rowHours, rowMinutes] = time.split(':').map(Number);
+    return rowHours < currentHours || (rowHours === currentHours && rowMinutes <= currentMinutes);
+  };
+
   // Render rows for each time with corresponding cars
   const renderRows = () => {
     const groupedCars = groupCarsByTime();
     const rows = [];
+    let lastGreyRow = null; // To keep track of the last grey row encountered
     for (const time in groupedCars) {
       if (groupedCars.hasOwnProperty(time)) {
         const cars = groupedCars[time];
         const timeRowSpan = cars.length;
+        const rowStyle = {};
+        if (isEarlierThanCurrentTime(time)) {
+          rowStyle.backgroundColor = '#d8d8d8'; // Rows earlier than current time are gray
+          lastGreyRow = time; // Update last grey row
+        }
         cars.forEach((car, index) => {
           rows.push(
-            <tr key={`${time}-${index}`} className="border-b">
+            <tr key={`${time}-${index}`} className="border-b" style={rowStyle}>
               {index === 0 && (
                 <th rowSpan={timeRowSpan} className="border-r px-4 py-2">{time}</th>
               )}
               <td className="items-center px-4 py-2">
-                <input type="checkbox" className="mr-2" />
+                {/* <input type="checkbox" className="mr-2" /> */}
                 <span>{car}</span>
               </td>
             </tr>
           );
         });
       }
+    }
+    // Apply green background to the last grey row
+    if (lastGreyRow) {
+      rows.forEach(row => {
+        if (row.key.startsWith(lastGreyRow)) {
+          row.props.style.backgroundColor = 'green';
+        }
+      });
     }
     return rows;
   };

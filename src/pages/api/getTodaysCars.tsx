@@ -4,14 +4,6 @@ import { NextApiRequest, NextApiResponse } from 'next';
 const getTodaysCars = async (req: NextApiRequest, res: NextApiResponse) => {
     const body = JSON.parse(req.body)
 
-    // function getDate() {
-    //     const today = new Date();
-    //     const month = ('0' + (today.getMonth() + 1)).slice(-2);
-    //     const year = today.getFullYear();
-    //     const date = today.getDate();
-    //     return `${year}-${month}-${date}`;
-    // }
-
     try {
         const response = await fetch(`https://r1riepas.lv/pieraksts`);
         const html = await response.text();
@@ -22,33 +14,28 @@ const getTodaysCars = async (req: NextApiRequest, res: NextApiResponse) => {
         const diena = document.querySelectorAll(`div[data-date="${body.inputDate}"]`);
         // Izvēlas Ulbroku
         const ulbroka = diena[0];
-    
-        const unfilteredCars = Array.from(ulbroka.querySelectorAll('.time-status')).filter(element => {
-            // Ensure the element and its textContent are defined
-            return element && element.textContent && !element.textContent.includes('Aizņemts');
-          });
 
-        const cars = unfilteredCars;
-        // Atrod visus pelekos ierakstus
-        const grayFields = ulbroka.querySelectorAll('.slot.unavailable.taken-slot'); 
-        // Izviltrē visus pelēkos laukus izņemot ar tekstu Aizņemts
+        const cars = Array.from(ulbroka.querySelectorAll('.time-status')).filter(element => {
+            return element && element.textContent && !element.textContent.includes('Aizņemts') && !element.textContent.includes('Brīvs');
+          });
         
-        const filteredGrayFields = Array.from(grayFields).filter(element => {
-            // Ensure the element and its textContent are defined
+        
+        // Izviltrē visus pelēkos laukus izņemot ar tekstu Aizņemts
+        const filteredGrayFields = Array.from(ulbroka.querySelectorAll('.slot.unavailable.taken-slot')).filter(element => {
             return element && element.textContent && !element.textContent.includes('Aizņemts');
           });
 
+        
+        const carsLeft = Array.from(ulbroka.querySelectorAll('.slot.taken-slot')).filter(element => {
+            return element && element.textContent && !element.textContent.includes('Aizņemts') && !element.classList.contains('unavailable');
+          });
         // const filteredElements = Array.from(elements).filter(element => !element.textContent.includes('Aizņemts'));
 
 
-        // atluksas masinas (Zalajos laukos)
-        const carsLeftToday = cars.length;
+        // // atluksas masinas (Zalajos laukos)
+        // const carsLeftToday = cars.length;
 
-        const totalCars = carsLeftToday + filteredGrayFields.length;
-
-        // atluksas masinas (Zalajos laukos)
-        const carsDoneToday = cars.length;
-
+        const totalCars = cars.length - filteredGrayFields.length;
 
         // Create an object to store cars grouped by time
         const groupedCars: { [time: string]: { name: string[] } } = {};
@@ -78,7 +65,21 @@ const getTodaysCars = async (req: NextApiRequest, res: NextApiResponse) => {
         // Convert groupedCars object into an array
         const carData = Object.entries(groupedCars).map(([time, { name }]) => ({ name, time }));
 
-        res.status(200).json({ carsLeft: carsLeftToday, totalCars: totalCars, cars: carData });
+        // Sort carData array by time
+        carData.sort((a, b) => {
+            // Extract hours and minutes from the time strings
+            const [aHours, aMinutes] = a.time.split(':').map(Number);
+            const [bHours, bMinutes] = b.time.split(':').map(Number);
+        
+            // Compare hours
+            if (aHours !== bHours) {
+              return aHours - bHours; // Sort by hours
+            } else {
+              return aMinutes - bMinutes; // If hours are equal, sort by minutes
+            }
+        });
+
+        res.status(200).json({ carsLeft: carsLeft.length, totalCars: cars.length, cars: carData });
     } catch (error) {
         res.status(500).json({ error: 'Internal Server Error' });
     }

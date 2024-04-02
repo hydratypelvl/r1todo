@@ -59,17 +59,27 @@ const Home = () => {
   return (
     <div>
       
-      { carData && <h1>Šodien pierakstā {carData && carData.totalCars} mašīnas. </h1> }
-      { carData && <h1>Vēl palikušas {carData && carData.carsLeft} mašīnas. </h1> }
-      { carData ? <CarTable data={carData} /> 
-      
-      : 
-      
-      <div className="absolute right-1/2 bottom-1/2  transform translate-x-1/2 translate-y-1/2 ">
-        <div className="border-t-transparent border-solid animate-spin  rounded-full border-blue-400 border-8 h-64 w-64"></div>
-        <div className="flex items-center justify-center mt-6">Loading... R2</div>
-      </div>
+      {
+        carData ? (
+          carData.totalCars === 0 && carData.carsLeft === 0 ? (
+            <div>
+              <h1>Šodien nav mašīnu</h1>
+            </div>
+          ) : (
+            <>
+              <h1>Šodien pierakstā {carData.totalCars} mašīnas.</h1>
+              <h1>Vēl palikušas {carData.carsLeft} mašīnas.</h1>
+              <CarTable data={carData} inputDate={inputDate}/>
+            </>
+          )
+        ) : (
+          <div className="absolute right-1/2 bottom-1/2 transform translate-x-1/2 translate-y-1/2 ">
+            <div className="border-t-transparent border-solid animate-spin rounded-full border-blue-400 border-8 h-64 w-64"></div>
+            <div className="flex items-center justify-center mt-6">Loading... R2</div>
+          </div>
+        )
       }
+
 
       {carData && 
         <form onSubmit={handleSubmit} className='my-4'>

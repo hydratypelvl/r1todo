@@ -1,6 +1,6 @@
 import React from 'react';
 
-const CarTable = ({ data }) => {
+const CarTable = ({ data, inputDate }) => {
   // Function to group cars by time
   const groupCarsByTime = () => {
     const groupedCars = {};
@@ -14,33 +14,45 @@ const CarTable = ({ data }) => {
     return groupedCars;
   };
 
-  function getTime() {
-    const today = new Date();
-    const hours = today.getHours();
-    const minutes = today.getMinutes();
-    return `${hours}:${minutes}`;
-  }
-
-  // Check if a given time is earlier than the current time
+  // Function to check if a given time is earlier than the current time
   const isEarlierThanCurrentTime = (time) => {
-    const [currentHours, currentMinutes] = getTime().split(':').map(Number);
+    const currentTime = new Date();
+    const [currentHours, currentMinutes] = [currentTime.getHours(), currentTime.getMinutes()];
     const [rowHours, rowMinutes] = time.split(':').map(Number);
     return rowHours < currentHours || (rowHours === currentHours && rowMinutes <= currentMinutes);
+  };
+
+  // Function to check if the given date is today
+  const isToday = (someDate) => {
+    const today = new Date();
+    const dateParts = someDate.split('-');
+    const date = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]); // Months are zero-based
+    return (
+      date.getDate() === today.getDate() &&
+      date.getMonth() === today.getMonth() &&
+      date.getFullYear() === today.getFullYear()
+    );
   };
 
   // Render rows for each time with corresponding cars
   const renderRows = () => {
     const groupedCars = groupCarsByTime();
     const rows = [];
-    let lastGreyRow = null; // To keep track of the last grey row encountered
+    let lastGreyRow = null; // To keep track of the last gray row encountered
     for (const time in groupedCars) {
       if (groupedCars.hasOwnProperty(time)) {
         const cars = groupedCars[time];
         const timeRowSpan = cars.length;
         const rowStyle = {};
-        if (isEarlierThanCurrentTime(time)) {
-          rowStyle.backgroundColor = '#d8d8d8'; // Rows earlier than current time are gray
-          lastGreyRow = time; // Update last grey row
+        if (isToday(inputDate)) {
+          if (isEarlierThanCurrentTime(time)) {
+            // Rows earlier than current time and today are gray
+            rowStyle.backgroundColor = '#d8d8d8';
+            lastGreyRow = time; // Update last gray row
+          } else if (lastGreyRow === time) {
+            // Apply blue background to the last gray row
+            rowStyle.backgroundColor = '#a0e0ff';
+          }
         }
         cars.forEach((car, index) => {
           rows.push(
@@ -49,21 +61,12 @@ const CarTable = ({ data }) => {
                 <th rowSpan={timeRowSpan} className="border-r px-4 py-2">{time}</th>
               )}
               <td className="items-center px-4 py-2">
-                {/* <input type="checkbox" className="mr-2" /> */}
                 <span>{car}</span>
               </td>
             </tr>
           );
         });
       }
-    }
-    // Apply green background to the last grey row
-    if (lastGreyRow) {
-      rows.forEach(row => {
-        if (row.key.startsWith(lastGreyRow)) {
-          row.props.style.backgroundColor = '#a0e0ff';
-        }
-      });
     }
     return rows;
   };

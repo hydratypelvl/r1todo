@@ -11,7 +11,8 @@ const getTodaysCars = async (req: NextApiRequest, res: NextApiResponse) => {
         const document = dom.window.document;
         // const todaysDate = getDate();
         // Atrod tabulu ar norādīto datumu
-        const diena = document.querySelectorAll(`div[data-date="${body.inputDate}"]`);
+        // const diena = document.querySelectorAll(`div[data-date="${body.inputDate}"]`);
+        const diena = document.querySelectorAll(`div[data-date="2024-04-05"]`);
         // Izvēlas Ulbroku
         const ulbroka = diena[0];
 

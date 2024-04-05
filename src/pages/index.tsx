@@ -45,7 +45,7 @@ const Home = () => {
     const today = new Date();
     const month = ('0' + (today.getMonth() + 1)).slice(-2);
     const year = today.getFullYear();
-    const date = ('0' + (today.getDate() + 1)).slice(-2);
+    const date = ('0' + (today.getDate())).slice(-2);
     return `${year}-${month}-${date}`;
   }
 

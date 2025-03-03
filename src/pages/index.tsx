@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import CarTable from '../components/CarTable';
 import { LuCalendarClock } from "react-icons/lu";
+import NewPage from '@/components/NewPage'
 
 interface Car {
   name: string;
@@ -57,6 +58,7 @@ const Home = () => {
   }, [initialLoad]);
 
   return (
+
     <div>
       
       {
@@ -82,6 +84,7 @@ const Home = () => {
 
 
       {carData && 
+      <div>
         <form onSubmit={handleSubmit} className='my-4'>
         
           <div className="relative"> 
@@ -101,8 +104,12 @@ const Home = () => {
 
           </div>
         </form>
+        <NewPage />
+        </div>
+        
       } 
-    </div>
+    </div>      
+
   );
 };
 
